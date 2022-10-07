@@ -9,9 +9,9 @@
 
 using namespace std;
 
-// Struct to hold the equation
-struct Equation {
-  // input stack to store the equation
+// Struct to hold the expression
+struct Expression {
+  // input stack to store the expression
   stack<char> input;
   // vector to hold the output
   vector<char> output;
@@ -38,14 +38,14 @@ void show_menu(){
   
 }
 
-// Function to check the syntax of the equation
+// Function to check the syntax of the expression
 // Te accepted syntax includes: A-Z, + - / * ^ () with no spaces in between
 // The function prints out the syntax errors with their position
 // Returns true for a valid syntax
-bool check_syntax(string equation ){
+bool check_syntax(string expression ){
    // check if the string is not empty.
-   if( equation.length() == 0){
-      cout<<"Please provide a valid equation."<<endl;
+   if( expression.length() == 0){
+      cout<<"Please provide a valid expression."<<endl;
       return false;
    }
 
@@ -54,10 +54,10 @@ bool check_syntax(string equation ){
    // Keep count of the number of opening and closing parenthesis
    int opening_parenthesis=0, closing_parenthesis=0;
   
-   // check if the equation matches the required syntax
-   for(int i =0; i< equation.length();i++){
+   // check if the expression matches the required syntax
+   for(int i =0; i< expression.length();i++){
 
-      char c = equation[i];
+      char c = expression.at(i);
 
       if(c>='A' && c<='Z'/* Between A-Z */){
          continue;
@@ -74,7 +74,7 @@ bool check_syntax(string equation ){
          continue;
       }else{
          // Print the unrecognized error
-         cout<<"Syntax error at character ("<<c<<") position "<<(i+1)<<endl;
+         wcout<<"Syntax error at character ("<<c<<") position "<<(i+1)<<endl;
          errors++;
       }
       
@@ -88,7 +88,7 @@ bool check_syntax(string equation ){
 
    // print and return false if any errors
    if(errors>0){
-      cout<<endl<<"Compiled equation with "<<errors<<" errors"<<endl;
+      cout<<endl<<"Compiled expression with "<<errors<<" errors"<<endl;
       cout<<"Accepted characters are A-Z, + - / * ^ ()"<<endl;
       return false;
    }
@@ -173,36 +173,36 @@ int compare_precedence(char a, char b){
       return -1;  // Lower precedence
 }
 
-// Computes the prefix of the provided syntatically valid equation
+// Computes the prefix of the provided syntatically valid expression
 void prefix(){
 
    // Prompt the user for input
    cout<<endl<<"Prefix "<<endl<<"_________________"<<endl;
-   cout<<"Enter prefix equation: "<<endl;
+   cout<<"Enter expression: "<<endl;
    
-   string equation;
-   cin>>equation;
+   string expression;
+   cin>>expression;
 
 
-   // trim equation whitespace characters
+   // trim expression whitespace characters
    string WHITESPACE = " \r\t\n\f\v";
-   size_t trim_start = equation.find_first_not_of(WHITESPACE);
-   size_t trim_end = equation.find_last_not_of(WHITESPACE);
+   size_t trim_start = expression.find_first_not_of(WHITESPACE);
+   size_t trim_end = expression.find_last_not_of(WHITESPACE);
 
-   equation = equation.substr(trim_start, trim_end+1);
+   expression = expression.substr(trim_start, trim_end+1);
 
-   // struct to hold the parsed equation
-   struct Equation eq;
+   // struct to hold the parsed expression
+   struct Expression eq;
 
-   if(check_syntax(equation)){
+   if(check_syntax(expression)){
       //push the reversed array into the input stack
       //Since we are pushing to a stack, it is automatically reversed = LIFO
-      for (int i = 0; i < equation.length(); i++)
+      for (int i = 0; i < expression.length(); i++)
       {
-         eq.input.push(equation[i]);
+         eq.input.push(expression[i]);
       }
    }else{
-      // Return if the equation has syntax errors
+      // Return if the expression has syntax errors
       return;
    }
 
@@ -212,7 +212,7 @@ void prefix(){
    //       |        |
    cout<<endl<<"  input\t| stack\t| output"<<endl<<"========================="<<endl;
 
-   // Loop through the input equation until it is empty
+   // Loop through the input expression until it is empty
    while(!eq.input.empty()){
       char input = eq.input.top();
       cout<<input;
@@ -262,36 +262,36 @@ void prefix(){
   
 }
 
-// Computes the postfix of the provided syntatically valid equation
+// Computes the postfix of the provided syntatically valid expression
 void postfix (){
 
    // Prompt the user for input
    cout<<endl<<"Postfix "<<endl<<"_________________"<<endl;
-   cout<<"Enter postfix equation: "<<endl;
+   cout<<"Enter expression: "<<endl;
    
-   string equation;
-   cin>>equation;
+   string expression;
+   cin>>expression;
 
 
-   // trim equation whitespace characters
+   // trim expression whitespace characters
    string WHITESPACE = " \r\t\n\f\v";
-   size_t trim_start = equation.find_first_not_of(WHITESPACE);
-   size_t trim_end = equation.find_last_not_of(WHITESPACE);
+   size_t trim_start = expression.find_first_not_of(WHITESPACE);
+   size_t trim_end = expression.find_last_not_of(WHITESPACE);
 
-   equation = equation.substr(trim_start, trim_end+1);
+   expression = expression.substr(trim_start, trim_end+1);
 
-   // struct to hold the parsed equation
-   struct Equation eq;
+   // struct to hold the parsed expression
+   struct Expression eq;
 
-   if(check_syntax(equation)){
-      //push the equation on the input stack in reverse to ensure that 
-      // it ends up in the same order as the input equation due to LIFO
-      for (int i = equation.length()-1; i >= 0; i--)
+   if(check_syntax(expression)){
+      //push the expression on the input stack in reverse to ensure that 
+      // it ends up in the same order as the input expression due to LIFO
+      for (int i = expression.length()-1; i >= 0; i--)
       {
-         eq.input.push(equation[i]);
+         eq.input.push(expression[i]);
       }
    }else{
-      // Return if the equation has syntax errors
+      // Return if the expression has syntax errors
       return;
    }
 
