@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <string>
 
-#define MAX 100
+
 
 using namespace std;
 
@@ -262,12 +262,17 @@ void prefix(){
   
 }
 
+// Computes the postfix of the provided syntatically valid equation
 void postfix (){
-  cout<<endl<<"Postfix "<<endl<<"_________________"<<endl;
-  cout<<"Enter postfix equation: "<<endl;
-  
-  string equation;
-  cin>>equation;
+
+   // Prompt the user for input
+   cout<<endl<<"Postfix "<<endl<<"_________________"<<endl;
+   cout<<"Enter postfix equation: "<<endl;
+   
+   string equation;
+   cin>>equation;
+
+
    // trim equation whitespace characters
    string WHITESPACE = " \r\t\n\f\v";
    size_t trim_start = equation.find_first_not_of(WHITESPACE);
@@ -275,19 +280,25 @@ void postfix (){
 
    equation = equation.substr(trim_start, trim_end+1);
 
+   // struct to hold the parsed equation
    struct Equation eq;
 
    if(check_syntax(equation)){
-      //push the equation on the input stack in reverse to ensure that it ends up in the same order as the input equation due to LIFO
+      //push the equation on the input stack in reverse to ensure that 
+      // it ends up in the same order as the input equation due to LIFO
       for (int i = equation.length()-1; i >= 0; i--)
       {
          eq.input.push(equation[i]);
       }
    }else{
+      // Return if the equation has syntax errors
       return;
    }
 
-   //show table
+   // show table header
+   // input |  stack |  output
+   // =========================
+   //       |        |
    cout<<endl<<"  input\t| stack\t| output"<<endl<<"========================="<<endl;
 
    while(!eq.input.empty()){
@@ -299,7 +310,7 @@ void postfix (){
          eq.output.push_back(input);
          
       }else{
-         //try to pop all operators in the operator stack until none remains higher precedence
+         //try to pop all operators in the operator stack until none remains higher precedence or equal precedence
          while (!eq.operator_stack.empty() && (compare_precedence(input, eq.operator_stack.top()) == -1 || compare_precedence(input, eq.operator_stack.top()) == 0))
          {
             // Get the top operator and pop it
@@ -321,61 +332,69 @@ void postfix (){
       eq.input.pop();
    }
 
+   // pop the remaining operators and add them to the output vectors
    while (!eq.operator_stack.empty())
    {
       eq.output.push_back(eq.operator_stack.top());
       eq.operator_stack.pop();
    }
 
+   //table footer
    cout<<"\t|\t| "<<get_vector_string(eq.output);
    cout<<endl<<"========================="<<endl;
 
+   // print the postfix result
    string output_str = get_vector_string(eq.output);
 
    cout<<"Result:\t  "<<output_str<<endl;
   
 }
+
+/* ================
+   Main function
+ ================ */
+
+ // main function
 int main(){
   
-  //show menu;
+  // int to store menu choice
   int menu_choice;
+
+  // Infinately loop through the menu until the user exits the program
   while(true){
+    // Show the menu and prompt for an option
     show_menu();
     
-    //read menu choice allowing only integer values
+    // read menu choice allowing only integer values
     cin>>menu_choice;
+
     if(!cin){
+      // Non integer value was inerted
       cout<<"Enter a valid choice or (3) to exit "<<endl;
-      cin.clear();
+      cin.clear();      //clear the input buffer
       cin.ignore(numeric_limits<streamsize>::max(), '\n');
       continue;
     }
     
+    // check the provided menu options
     switch (menu_choice){
       case menu_prefix:
-          //Prefix stuff
+          //Prefix prompt
          prefix();
         break;
       case menu_postfix:
-          //Postfix stuff
+          //Postfix prompt
           postfix();
         break;
       case menu_exit:
           //Exit
         return 0;
       default:
+         // Invalid choice
         cout<<"Invalid choice "<<endl;
         continue;
     }
   }
-  string equation;
-  
-   cin>>equation;
-   
-   cout<<equation.length()<<endl;
-   
-   for(int i = 0; i < equation.length(); i++){
-     
-   }
    
 }
+// We are done here 😅🚀
