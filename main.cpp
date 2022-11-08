@@ -39,7 +39,7 @@ void show_menu(){
 }
 
 // Function to check the syntax of the expression
-// Te accepted syntax includes: A-Z, + - / * ^ () with no spaces in between
+// The accepted syntax includes: A-Z, + - / * ^ () with no spaces in between
 // The function prints out the syntax errors with their position
 // Returns true for a valid syntax
 bool check_syntax(string expression ){
@@ -173,16 +173,13 @@ int compare_precedence(char a, char b){
       return -1;  // Lower precedence
 }
 
+bool is_alphabet(char c){
+   return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
+}
+
+
 // Computes the prefix of the provided syntatically valid expression
-void prefix(){
-
-   // Prompt the user for input
-   cout<<endl<<"Prefix "<<endl<<"_________________"<<endl;
-   cout<<"Enter expression: "<<endl;
-   
-   string expression;
-   cin>>expression;
-
+void prefix(string expression){
 
    // trim expression whitespace characters
    string WHITESPACE = " \r\t\n\f\v";
@@ -197,9 +194,26 @@ void prefix(){
    if(check_syntax(expression)){
       //push the reversed array into the input stack
       //Since we are pushing to a stack, it is automatically reversed = LIFO
+      char last = '\0';
       for (int i = 0; i < expression.length(); i++)
       {
-         eq.input.push(expression[i]);
+         char input = expression[i];
+         if (input == '(' && is_alphabet(last) || is_alphabet(input) && is_alphabet(last))
+         {
+             eq.input.push('*');
+             eq.input.push(input);
+             last = '\0';
+            //  continue;
+         }else if (is_alphabet(input) && last == ')')
+         {
+             eq.input.push('*');
+             eq.input.push(input);
+             last = '\0';
+            //  continue;
+         }else
+            eq.input.push(expression[i]);
+         
+         last = expression[i];
       }
    }else{
       // Return if the expression has syntax errors
@@ -210,14 +224,16 @@ void prefix(){
    // input |  stack |  output
    // =========================
    //       |        |
-   cout<<endl<<"  input\t| stack\t| output"<<endl<<"========================="<<endl;
+   cout<<"| input\t| stack\t\t| output"<<endl<<"+-------+---------------+"<<endl;
+   char last = '\0';
 
    // Loop through the input expression until it is empty
    while(!eq.input.empty()){
       char input = eq.input.top();
-      cout<<input;
 
-      if(input >= 'A' && input <= 'Z'){
+      cout<<"|  "<<input;
+      
+      if(is_alphabet(input)){
          //goes to output
          eq.output.push_back(input);
          
@@ -227,6 +243,24 @@ void prefix(){
          {
             // Get the top operator and pop it
             char top = eq.operator_stack.top();
+            if (input == ')'){
+               break;
+            }else if(input == '('){
+               // pop everything until the top has (
+                  
+                  while (!eq.operator_stack.empty() && top != ')')
+                  {
+                     eq.output.push_back(top);
+                     eq.operator_stack.pop();
+                     top = eq.operator_stack.top();
+                  }
+                  
+                  if(top == ')'){
+                     eq.operator_stack.pop();
+                  }
+                  break;
+            } 
+            
             eq.operator_stack.pop();
 
             //push the poped value to the output
@@ -234,25 +268,34 @@ void prefix(){
          }
 
          // Its safe to push the current operator to the output stack
-         eq.operator_stack.push(input);
+         if (input != '(')
+         {  
+             eq.operator_stack.push(input);
+         }
 
       }
       //print the current table state
       stack<char> op = eq.operator_stack;
-      cout<<"\t| "<<get_stack_string(op)<<"\t| "<<get_vector_string(eq.output);
+      cout<<"\t| "<<get_stack_string(op)<<"\t\t| "<<get_vector_string(eq.output);
       cout<<endl;
       eq.input.pop();
+      last = input;
+
    }
 
    // pop the remaining operators and add them to the output vector
    while (!eq.operator_stack.empty())
    {
-      eq.output.push_back(eq.operator_stack.top());
+      char top = eq.operator_stack.top();
+      if (top != ')' )
+      {
+         eq.output.push_back(top);
+      }
       eq.operator_stack.pop();
    }
 
-   cout<<"\t|\t| "<<get_vector_string(eq.output);
-   cout<<endl<<"========================="<<endl;
+   cout<<"|\t|\t\t| "<<get_vector_string(eq.output);
+   cout<<endl<<"+-------+---------------+"<<endl;
 
    //Reverse the output vector to obtain the prefix stack
    string output_str = get_vector_string(eq.output);
@@ -263,15 +306,7 @@ void prefix(){
 }
 
 // Computes the postfix of the provided syntatically valid expression
-void postfix (){
-
-   // Prompt the user for input
-   cout<<endl<<"Postfix "<<endl<<"_________________"<<endl;
-   cout<<"Enter expression: "<<endl;
-   
-   string expression;
-   cin>>expression;
-
+void postfix (string expression){
 
    // trim expression whitespace characters
    string WHITESPACE = " \r\t\n\f\v";
@@ -299,49 +334,97 @@ void postfix (){
    // input |  stack |  output
    // =========================
    //       |        |
-   cout<<endl<<"  input\t| stack\t| output"<<endl<<"========================="<<endl;
+   cout<<"| input\t| stack\t\t| output:"<<endl<<"+-------+---------------+"<<endl;
+
+   char last = '\0';
 
    while(!eq.input.empty()){
       char input = eq.input.top();
-      cout<<"  "<<input;
 
-      if(input >= 'A' && input <= 'Z'){
+         if (input == '(' && is_alphabet(last) || is_alphabet(input) && is_alphabet(last))
+         {
+             eq.input.pop();
+             eq.input.push(input);
+             eq.input.push('*');
+             last = '\0';
+             continue;
+         }else if (is_alphabet(input) && last == ')')
+         {
+             eq.input.pop();
+             eq.input.push('*');
+             eq.input.push(input);
+             last = '\0';
+             continue;
+         }
+         
+         
+      cout<<"|  "<<input;
+      
+
+      if(is_alphabet(input)){
          //goes to output
          eq.output.push_back(input);
-         
       }else{
+         
          //try to pop all operators in the operator stack until none remains higher precedence or equal precedence
          while (!eq.operator_stack.empty() && (compare_precedence(input, eq.operator_stack.top()) == -1 || compare_precedence(input, eq.operator_stack.top()) == 0))
          {
             // Get the top operator and pop it
             char top = eq.operator_stack.top();
+            if (top == '('){
+               break;
+            }else if(input == ')'){
+               // pop everything until the top has (
+                  
+                  while (!eq.operator_stack.empty() && top != '(')
+                  {
+                     eq.output.push_back(top);
+                     eq.operator_stack.pop();
+                     top = eq.operator_stack.top();
+                  }
+                  
+                  if(top == '('){
+                     eq.operator_stack.pop();
+                  }
+                  break;
+            }
             eq.operator_stack.pop();
 
             //push the poped value to the output
             eq.output.push_back(top);
          }
-
+         
          // Its safe to push the current operator to the output stack
-         eq.operator_stack.push(input);
+         if (input != ')')
+         {  
+             eq.operator_stack.push(input);
+         }
+         
 
       }
       //print the current table state
       stack<char> op = eq.operator_stack;
-      cout<<"\t| "<<get_stack_string(op)<<"\t| "<<get_vector_string(eq.output);
+      cout<<"\t| "<<get_stack_string(op)<<"\t\t| "<<get_vector_string(eq.output)<<" ";
       cout<<endl;
       eq.input.pop();
+      last = input;
    }
 
    // pop the remaining operators and add them to the output vectors
    while (!eq.operator_stack.empty())
    {
-      eq.output.push_back(eq.operator_stack.top());
+      char top = eq.operator_stack.top();
+      if (top != '(' )
+      {
+         eq.output.push_back(top);
+      }
+      
       eq.operator_stack.pop();
    }
 
    //table footer
-   cout<<"\t|\t| "<<get_vector_string(eq.output);
-   cout<<endl<<"========================="<<endl;
+   cout<<"|\t|\t\t| "<<get_vector_string(eq.output);
+   cout<<endl<<"+-------+---------------+"<<endl;
 
    // print the postfix result
    string output_str = get_vector_string(eq.output);
@@ -360,41 +443,53 @@ int main(){
   // int to store menu choice
   int menu_choice;
 
-  // Infinately loop through the menu until the user exits the program
-  while(true){
-    // Show the menu and prompt for an option
-    show_menu();
-    
-    // read menu choice allowing only integer values
-    cin>>menu_choice;
+  cout<<"Enter expression: ";
+  string expression;
+  cin>>expression;
 
-    if(!cin){
-      // Non integer value was inerted
-      cout<<"Enter a valid choice or (3) to exit "<<endl;
-      cin.clear();      //clear the input buffer
-      cin.ignore(numeric_limits<streamsize>::max(), '\n');
-      continue;
-    }
+   // check if expression has correct syntax
+   if(check_syntax(expression)){
+      cout<<"\nPrefix\n+-------+---------------+"<<endl;
+      prefix(expression);
+      cout<<"\nPostfix\n+-------+---------------+"<<endl;
+      postfix(expression);
+   }
+
+//   // Infinately loop through the menu until the user exits the program
+//   while(true){
+//     // Show the menu and prompt for an option
+//     show_menu();
     
-    // check the provided menu options
-    switch (menu_choice){
-      case menu_prefix:
-          //Prefix prompt
-         prefix();
-        break;
-      case menu_postfix:
-          //Postfix prompt
-          postfix();
-        break;
-      case menu_exit:
-          //Exit
-        return 0;
-      default:
-         // Invalid choice
-        cout<<"Invalid choice "<<endl;
-        continue;
-    }
-  }
+//     // read menu choice allowing only integer values
+//     cin>>menu_choice;
+
+//     if(!cin){
+//       // Non integer value was inerted
+//       cout<<"Enter a valid choice or (3) to exit "<<endl;
+//       cin.clear();      //clear the input buffer
+//       cin.ignore(numeric_limits<streamsize>::max(), '\n');
+//       continue;
+//     }
+    
+//     // check the provided menu options
+//     switch (menu_choice){
+//       case menu_prefix:
+//           //Prefix prompt
+//          prefix();
+//         break;
+//       case menu_postfix:
+//           //Postfix prompt
+//           postfix();
+//         break;
+//       case menu_exit:
+//           //Exit
+//         return 0;
+//       default:
+//          // Invalid choice
+//         cout<<"Invalid choice "<<endl;
+//         continue;
+//     }
+//   }
    
 }
-// We are done here 😅🚀
+// We are done here 😅🚀    

@@ -3,6 +3,8 @@
         "array": "cpp",
         "string_view": "cpp",
         "ranges": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "iostream": "cpp",
+        "iosfwd": "cpp"
     }
 }
