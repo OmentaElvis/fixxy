@@ -59,7 +59,7 @@ bool check_syntax(string expression ){
 
       char c = expression.at(i);
 
-      if(c>='A' && c<='Z'/* Between A-Z */){
+      if(c>='A' && c<='Z' || c >= 'a' && c <= 'z' /* Between A-Z */){
          continue;
       }else if(c=='*' || c == '+' || c == '/' || c == '-' || c == '^'){
          // contains + - / * ^
@@ -454,42 +454,6 @@ int main(){
       cout<<"\nPostfix\n+-------+---------------+"<<endl;
       postfix(expression);
    }
-
-//   // Infinately loop through the menu until the user exits the program
-//   while(true){
-//     // Show the menu and prompt for an option
-//     show_menu();
-    
-//     // read menu choice allowing only integer values
-//     cin>>menu_choice;
-
-//     if(!cin){
-//       // Non integer value was inerted
-//       cout<<"Enter a valid choice or (3) to exit "<<endl;
-//       cin.clear();      //clear the input buffer
-//       cin.ignore(numeric_limits<streamsize>::max(), '\n');
-//       continue;
-//     }
-    
-//     // check the provided menu options
-//     switch (menu_choice){
-//       case menu_prefix:
-//           //Prefix prompt
-//          prefix();
-//         break;
-//       case menu_postfix:
-//           //Postfix prompt
-//           postfix();
-//         break;
-//       case menu_exit:
-//           //Exit
-//         return 0;
-//       default:
-//          // Invalid choice
-//         cout<<"Invalid choice "<<endl;
-//         continue;
-//     }
-//   }
    
 }
 // We are done here 😅🚀    
